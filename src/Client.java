@@ -1,44 +1,56 @@
 import java.io.*;
 import java.net.*;
-import java.util.Scanner;
+import java.util.*;
 
 public class Client {
     public static void main(String[] args) throws IOException {
         Scanner input = new Scanner(System.in);
         int port = 4000;
-        String mmm = "";  // variabile per l'ultima cifra IP
 
         while (true) {
-            System.out.print("Inserisci l'indirizzo del server (solo l'ultima cifra, es. '12' per 192.168.4.12) [Invio per mantenere " + (mmm.isEmpty() ? "nessuno" : mmm) + "]: ");
-            String newMmm = input.nextLine();
+            System.out.print("Inserisci le ultime cifre degli indirizzi dei server separate da spazi o virgole (es. '12 15 18') [Invio per mantenere quelli precedenti]: ");
+            String line = input.nextLine().trim();
 
-            if (!newMmm.trim().isEmpty()) {
-                mmm = newMmm.trim();
+            // Lista per memorizzare le ultime cifre degli IP
+            List<String> servers = new ArrayList<>();
+
+            if (!line.isEmpty()) {
+                // Split per spazi o virgole
+                String[] parts = line.split("[,\\s]+");
+                for (String part : parts) {
+                    if (!part.isEmpty()) {
+                        servers.add(part);
+                    }
+                }
             }
 
-            if (mmm.isEmpty()) {
-                System.out.println("Devi inserire un indirizzo valido!");
-                continue;  // ripeti la richiesta se non hai un IP
+            if (servers.isEmpty()) {
+                System.out.println("Devi inserire almeno un indirizzo valido!");
+                continue;
             }
 
             System.out.println("Inserisci il messaggio da inviare (digita 'EOF' per terminare l'inserimento):");
 
             StringBuilder message = new StringBuilder();
             while (true) {
-                String line = input.nextLine();
-                if (line.equalsIgnoreCase("EOF")) {
+                String msgLine = input.nextLine();
+                if (msgLine.equalsIgnoreCase("EOF")) {
                     break;
                 }
-                message.append(line).append("\n");
+                message.append(msgLine).append("\n");
             }
 
-            try (Socket s = new Socket("192.168.4." + mmm, port);
-                 PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(s.getOutputStream())), true)) {
+            String msgToSend = message.toString().trim();
 
-                out.println(message.toString().trim());  // Rimuove l’ultima newline
-                System.out.println("Messaggio inviato a 192.168.4." + mmm);
-            } catch (IOException e) {
-                System.out.println("Errore di connessione: " + e.getMessage());
+            for (String mmm : servers) {
+                try (Socket s = new Socket("192.168.4." + mmm, port);
+                     PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(s.getOutputStream())), true)) {
+
+                    out.println(msgToSend);
+                    System.out.println("Messaggio inviato a 192.168.4." + mmm);
+                } catch (IOException e) {
+                    System.out.println("Errore di connessione a 192.168.4." + mmm + ": " + e.getMessage());
+                }
             }
         }
     }
