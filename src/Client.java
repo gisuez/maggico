@@ -43,7 +43,7 @@ public class Client {
             String msgToSend = message.toString().trim();
 
             for (String mmm : servers) {
-                try (Socket s = new Socket("192.168.4." + mmm, port);
+                try (Socket s = new Socket("192.168." + mmm, port);
                      PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(s.getOutputStream())), true)) {
 
                     out.println(msgToSend);
