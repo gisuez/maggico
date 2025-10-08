@@ -47,9 +47,9 @@ public class Client {
                      PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(s.getOutputStream())), true)) {
 
                     out.println(msgToSend);
-                    System.out.println("Messaggio inviato a 192.168.4." + mmm);
+                    System.out.println("Messaggio inviato a 192.168." + mmm);
                 } catch (IOException e) {
-                    System.out.println("Errore di connessione a 192.168.4." + mmm + ": " + e.getMessage());
+                    System.out.println("Errore di connessione a 192.168." + mmm + ": " + e.getMessage());
                 }
             }
         }
